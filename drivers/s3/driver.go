@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/alist-org/alist/v3/server/common"
 	"io"
 	"net/url"
 	stdpath "path"
 	"strings"
 	"time"
+
+	"github.com/alist-org/alist/v3/server/common"
 
 	"github.com/alist-org/alist/v3/internal/stream"
 	"github.com/alist-org/alist/v3/pkg/cron"
@@ -101,9 +102,11 @@ func (d *S3) Link(ctx context.Context, file model.Obj, args model.LinkArgs) (*mo
 	if d.CustomHost != "" {
 		err = req.Build()
 		link.URL = req.HTTPRequest.URL.String()
+		fmt.Println(link)
 		if d.RemoveBucket {
 			link.URL = strings.Replace(link.URL, "/"+d.Bucket, "", 1)
 		}
+		link.URL, err = req.Presign(time.Hour * time.Duration(d.SignURLExpire))
 	} else {
 		if common.ShouldProxy(d, filename) {
 			err = req.Sign()
@@ -116,6 +119,8 @@ func (d *S3) Link(ctx context.Context, file model.Obj, args model.LinkArgs) (*mo
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("return link:")
+	fmt.Println(link)
 	return &link, nil
 }
 
