@@ -119,8 +119,6 @@ func (d *S3) Link(ctx context.Context, file model.Obj, args model.LinkArgs) (*mo
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("return link:")
-	fmt.Println(link)
 	return &link, nil
 }
 
